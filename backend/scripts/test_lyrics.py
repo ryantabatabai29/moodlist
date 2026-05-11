@@ -1,9 +1,11 @@
 import asyncio
 import sys
-sys.path.insert(0, ".")
-sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
 
-from app.services.lyrics import fetch_lyrics
+sys.path.insert(0, ".")
+
+from app.services.lyrics import fetch_lyrics  # noqa: E402
+
+sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
 
 TRACKS = [
     # Mega-hits

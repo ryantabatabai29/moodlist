@@ -1,7 +1,9 @@
 import asyncio
 import sys
-sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+
 import httpx
+
+sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
 
 async def main():
     async with httpx.AsyncClient(timeout=10.0) as client:

@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from app.services.ranking import mmr_rerank, rank_tracks
 

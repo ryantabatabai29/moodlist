@@ -9,7 +9,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "skipLibCheck": true,
-    "types": ["chrome"]
+    "types": ["chrome", "vite/client"]
   },
   "include": ["src", "popup.html", "callback.html"]
 }
