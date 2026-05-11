@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Moodlist",
+  "version": "0.1.0",
+  "description": "Generate mood-based Spotify subplaylists from a free-text prompt.",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": [
+    "https://accounts.spotify.com/*",
+    "https://api.spotify.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Moodlist"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["callback.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
