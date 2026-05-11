@@ -20,6 +20,9 @@ build/
 node_modules/
 extension/dist/
 
+# Claude Code local config
+.claude/
+
 # IDEs
 .vscode/
 .idea/
