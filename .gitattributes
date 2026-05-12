@@ -1,0 +1,2 @@
+# Force LF for shell scripts so git hooks work on all platforms
+.githooks/* text eol=lf

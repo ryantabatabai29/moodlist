@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+# Detect ruff path (Windows .venv/Scripts vs Unix .venv/bin)
+if [ -f "backend/.venv/Scripts/ruff.exe" ]; then
+    RUFF="$(pwd)/backend/.venv/Scripts/ruff.exe"
+elif [ -f "backend/.venv/Scripts/ruff" ]; then
+    RUFF="$(pwd)/backend/.venv/Scripts/ruff"
+else
+    RUFF="$(pwd)/backend/.venv/bin/ruff"
+fi
+
+echo "pre-push: running checks..."
+
+echo "  [1/4] ruff check"
+(cd backend && "$RUFF" check .)
+
+echo "  [2/4] ruff format"
+(cd backend && "$RUFF" format --check .)
+
+echo "  [3/4] tsc typecheck"
+(cd extension && npm run typecheck --silent)
+
+echo "  [4/4] eslint"
+(cd extension && npm run lint --silent)
+
+echo "pre-push: all checks passed"
