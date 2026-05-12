@@ -61,7 +61,10 @@ class SpotifyClient:
     async def get_playlist_tracks(self, playlist_id: str) -> list[SpotifyTrack]:
         tracks: list[SpotifyTrack] = []
         url: str | None = f"{SPOTIFY_BASE}/playlists/{playlist_id}/tracks"
-        params: dict | None = {"limit": 100, "fields": "next,items(track(id,uri,name,popularity,explicit,duration_ms,artists(id,name)))"}
+        params: dict | None = {
+            "limit": 100,
+            "fields": "next,items(track(id,uri,name,popularity,explicit,duration_ms,artists(id,name)))",
+        }
 
         while url:
             data = await self._get(url, params=params)
@@ -129,11 +132,15 @@ class SpotifyClient:
                 await asyncio.sleep(retry_after)
                 continue
             if resp.status_code == 404:
-                raise HTTPException(status_code=404, detail="Spotify resource not found")
+                raise HTTPException(
+                    status_code=404, detail="Spotify resource not found"
+                )
             resp.raise_for_status()
             return resp.json()
 
-        raise HTTPException(status_code=429, detail="Spotify rate limit — try again later")
+        raise HTTPException(
+            status_code=429, detail="Spotify rate limit — try again later"
+        )
 
     async def _post(self, url: str, json: dict) -> dict:
         async with httpx.AsyncClient(timeout=30.0) as client:

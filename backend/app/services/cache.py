@@ -12,7 +12,9 @@ async def get_snapshot_id(redis: aioredis.Redis, playlist_id: str) -> str | None
     return await redis.get(f"playlist_snap:{playlist_id}")
 
 
-async def set_snapshot_id(redis: aioredis.Redis, playlist_id: str, snapshot_id: str) -> None:
+async def set_snapshot_id(
+    redis: aioredis.Redis, playlist_id: str, snapshot_id: str
+) -> None:
     await redis.setex(f"playlist_snap:{playlist_id}", SNAPSHOT_TTL, snapshot_id)
 
 

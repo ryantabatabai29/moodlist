@@ -22,7 +22,9 @@ async def fetch_lyrics(track_name: str, artist_name: str) -> str | None:
         return await _try(client, _search_freetext, track_name, artist_name)
 
 
-async def _try(client: httpx.AsyncClient, fn, track_name: str, artist_name: str) -> str | None:
+async def _try(
+    client: httpx.AsyncClient, fn, track_name: str, artist_name: str
+) -> str | None:
     for attempt in range(MAX_RETRIES):
         try:
             return await fn(client, track_name, artist_name)
@@ -34,7 +36,9 @@ async def _try(client: httpx.AsyncClient, fn, track_name: str, artist_name: str)
     return None
 
 
-async def _get_exact(client: httpx.AsyncClient, track_name: str, artist_name: str) -> str | None:
+async def _get_exact(
+    client: httpx.AsyncClient, track_name: str, artist_name: str
+) -> str | None:
     resp = await client.get(
         f"{LRCLIB_BASE}/get",
         params={"track_name": track_name, "artist_name": artist_name},
@@ -45,7 +49,9 @@ async def _get_exact(client: httpx.AsyncClient, track_name: str, artist_name: st
     return _extract(resp.json())
 
 
-async def _search_structured(client: httpx.AsyncClient, track_name: str, artist_name: str) -> str | None:
+async def _search_structured(
+    client: httpx.AsyncClient, track_name: str, artist_name: str
+) -> str | None:
     resp = await client.get(
         f"{LRCLIB_BASE}/search",
         params={"track_name": track_name, "artist_name": artist_name},
@@ -56,7 +62,9 @@ async def _search_structured(client: httpx.AsyncClient, track_name: str, artist_
     return _first_with_lyrics(resp.json())
 
 
-async def _search_freetext(client: httpx.AsyncClient, track_name: str, artist_name: str) -> str | None:
+async def _search_freetext(
+    client: httpx.AsyncClient, track_name: str, artist_name: str
+) -> str | None:
     resp = await client.get(
         f"{LRCLIB_BASE}/search",
         params={"q": f"{track_name} {artist_name}"},
@@ -98,7 +106,7 @@ def _strip_lrc_timestamps(lrc: str) -> str:
         tag = line[1:bracket_end]
         if not tag[:2].isdigit():
             continue
-        text = line[bracket_end + 1:].strip()
+        text = line[bracket_end + 1 :].strip()
         if text:
             lines.append(text)
     return "\n".join(lines)

@@ -41,7 +41,10 @@ def mmr_rerank(
             best = max(
                 remaining,
                 key=lambda i: lmbda * prompt_sims[i]
-                - (1 - lmbda) * float(cosine_similarity(matrix[i].reshape(1, -1), selected_matrix).max()),
+                - (1 - lmbda)
+                * float(
+                    cosine_similarity(matrix[i].reshape(1, -1), selected_matrix).max()
+                ),
             )
         selected.append(best)
         remaining.remove(best)

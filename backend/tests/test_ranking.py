@@ -48,7 +48,9 @@ def test_mmr_prefers_relevant_track():
     irrelevant = np.zeros(dim)
     irrelevant[1] = 1.0
 
-    result = mmr_rerank(prompt, {"relevant": relevant, "irrelevant": irrelevant}, top_k=1)
+    result = mmr_rerank(
+        prompt, {"relevant": relevant, "irrelevant": irrelevant}, top_k=1
+    )
     assert result[0] == "relevant"
 
 
@@ -69,6 +71,8 @@ def test_mmr_reduces_redundancy():
     diverse = np.zeros(dim)
     diverse[1] = 1.0
 
-    result = mmr_rerank(prompt, {"clone_a": clone_a, "clone_b": clone_b, "diverse": diverse}, top_k=2)
+    result = mmr_rerank(
+        prompt, {"clone_a": clone_a, "clone_b": clone_b, "diverse": diverse}, top_k=2
+    )
     assert "diverse" in result
     assert len(result) == 2

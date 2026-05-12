@@ -85,30 +85,40 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
             }
             await set_track_meta(redis, track.id, meta)
 
-        scalar = np.array([
-            meta["popularity"] / 100,
-            float(meta["explicit"]),
-            min(meta["duration_ms"] / MAX_DURATION_MS, 1.0),
-        ])
+        scalar = np.array(
+            [
+                meta["popularity"] / 100,
+                float(meta["explicit"]),
+                min(meta["duration_ms"] / MAX_DURATION_MS, 1.0),
+            ]
+        )
 
         # Genre embedding (cached in Postgres per primary artist)
         genre_emb: np.ndarray | None = None
         if track.artist_ids:
-            genre_emb = await get_genre_embedding(pool, track.artist_ids[0], settings.model_version)
+            genre_emb = await get_genre_embedding(
+                pool, track.artist_ids[0], settings.model_version
+            )
             if genre_emb is None:
                 artist = artist_map.get(track.artist_ids[0])
                 if artist and artist.genres:  # type: ignore[union-attr]
                     genre_text = ", ".join(artist.genres)  # type: ignore[union-attr]
                     genre_emb = sbert.encode(genre_text)
-                    await set_genre_embedding(pool, track.artist_ids[0], settings.model_version, genre_emb)
+                    await set_genre_embedding(
+                        pool, track.artist_ids[0], settings.model_version, genre_emb
+                    )
 
         # Lyric embedding (cached in Postgres per track)
-        lyric_emb: np.ndarray | None = await get_lyric_embedding(pool, track.id, settings.model_version)
+        lyric_emb: np.ndarray | None = await get_lyric_embedding(
+            pool, track.id, settings.model_version
+        )
         if lyric_emb is None:
             lyrics = lyrics_by_id.get(track.id)
             if lyrics:
                 lyric_emb = sbert.encode(lyrics)
-                await set_lyric_embedding(pool, track.id, settings.model_version, lyric_emb)
+                await set_lyric_embedding(
+                    pool, track.id, settings.model_version, lyric_emb
+                )
 
         track_vecs[track.uri] = sbert.build_track_vector(
             lyric_emb=lyric_emb,

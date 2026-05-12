@@ -42,6 +42,7 @@ TRACKS = [
     ("Bloodbuzz Ohio", "The National"),
 ]
 
+
 async def main():
     hits, misses = 0, 0
     miss_list = []
@@ -51,7 +52,7 @@ async def main():
         lyrics = await fetch_lyrics(name, artist)
         if lyrics:
             preview = lyrics[:60].replace("\n", " ")
-            print(f"  HIT   {artist} — {name}: \"{preview}…\"")
+            print(f'  HIT   {artist} — {name}: "{preview}…"')
             hits += 1
         else:
             print(f"  MISS  {artist} — {name}")
@@ -64,5 +65,6 @@ async def main():
         print("\nMisses:")
         for m in miss_list:
             print(f"  - {m}")
+
 
 asyncio.run(main())
