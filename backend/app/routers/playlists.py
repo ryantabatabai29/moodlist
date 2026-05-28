@@ -34,7 +34,9 @@ async def get_playlists(authorization: str = Header(...)) -> list[PlaylistItem]:
                 await redis.setex(f"playlist_count:{playlist_id}", COUNT_TTL, count)
                 return count
             except Exception:
-                await redis.setex(f"playlist_count:{playlist_id}", COUNT_TTL, "unavailable")
+                await redis.setex(
+                    f"playlist_count:{playlist_id}", COUNT_TTL, "unavailable"
+                )
                 return None
 
         counts = await asyncio.gather(*[get_count(pl["id"]) for pl in valid])

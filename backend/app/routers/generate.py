@@ -145,7 +145,9 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
         # Create Spotify playlist and populate it
         output_name = f"{req.prompt.title()} — from {playlist_name}"
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        description = f"Moodlist: '{req.prompt}' from {playlist_name}. Generated {today}."
+        description = (
+            f"Moodlist: '{req.prompt}' from {playlist_name}. Generated {today}."
+        )
 
         new_playlist_id = await client.create_playlist(output_name, description)
         await client.add_tracks(new_playlist_id, ranked_uris)
