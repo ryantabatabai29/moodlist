@@ -10,7 +10,7 @@ export type ErrorType =
 export interface PlaylistItem {
   id: string;
   name: string;
-  trackCount: number;
+  trackCount: number | null;
   imageUrl: string | null;
   isLikedSongs: boolean;
 }

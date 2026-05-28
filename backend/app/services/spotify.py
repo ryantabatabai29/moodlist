@@ -37,6 +37,13 @@ class SpotifyClient:
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
         }
+        self._http = httpx.AsyncClient(timeout=30.0)
+
+    async def __aenter__(self) -> "SpotifyClient":
+        return self
+
+    async def __aexit__(self, *_: object) -> None:
+        await self._http.aclose()
 
     async def get_playlists(self) -> list[dict]:
         items: list[dict] = []
@@ -54,6 +61,13 @@ class SpotifyClient:
     async def get_liked_songs_count(self) -> int:
         data = await self._get(f"{SPOTIFY_BASE}/me/tracks", params={"limit": 1})
         return data["total"]
+
+    async def get_playlist_items_count(self, playlist_id: str) -> int:
+        data = await self._get(
+            f"{SPOTIFY_BASE}/playlists/{playlist_id}/items",
+            params={"limit": 1},
+        )
+        return data.get("total", 0)
 
     async def get_playlist_info(self, playlist_id: str) -> dict:
         return await self._get(
@@ -122,11 +136,12 @@ class SpotifyClient:
 
     async def _get(self, url: str, params: dict | None = None) -> dict:
         for attempt in range(MAX_RETRIES):
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                resp = await client.get(url, headers=self._headers, params=params)
+            resp = await self._http.get(url, headers=self._headers, params=params)
 
             if resp.status_code == 401:
                 raise HTTPException(status_code=401, detail="Spotify token expired")
+            if resp.status_code == 403:
+                raise HTTPException(status_code=403, detail="Spotify access forbidden")
             if resp.status_code == 429:
                 retry_after = int(resp.headers.get("Retry-After", 2**attempt))
                 await asyncio.sleep(retry_after)
@@ -145,8 +160,7 @@ class SpotifyClient:
         )
 
     async def _post(self, url: str, json: dict) -> dict:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(url, headers=self._headers, json=json)
+        resp = await self._http.post(url, headers=self._headers, json=json)
         if resp.status_code == 401:
             raise HTTPException(status_code=401, detail="Spotify token expired")
         resp.raise_for_status()

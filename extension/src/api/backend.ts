@@ -16,7 +16,7 @@ export async function getPlaylists(accessToken: string): Promise<PlaylistItem[]>
   const data = (await resp.json()) as Array<{
     id: string;
     name: string;
-    track_count: number;
+    track_count: number | null;
     image_url: string | null;
     is_liked_songs: boolean;
   }>;

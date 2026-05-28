@@ -13,7 +13,7 @@ export function PlaylistSelector({ playlists, value, onChange }: Props) {
       <select value={value} onChange={(e) => onChange(e.target.value)} style={styles.select}>
         {playlists.map((pl) => (
           <option key={pl.id} value={pl.id}>
-            {pl.name} ({pl.trackCount} tracks)
+            {pl.name}{pl.trackCount != null ? ` (${pl.trackCount} tracks)` : ""}
           </option>
         ))}
       </select>

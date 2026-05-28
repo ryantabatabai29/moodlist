@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 class PlaylistItem(BaseModel):
     id: str
     name: str
-    track_count: int
+    track_count: int | None = None
     image_url: str | None = None
     is_liked_songs: bool = False
 
