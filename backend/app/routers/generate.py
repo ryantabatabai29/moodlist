@@ -54,10 +54,13 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
     # Batch-fetch artist objects for genre tags
     artist_ids = list({aid for t in tracks for aid in t.artist_ids})
     artist_map: dict[str, object] = {}
-    for i in range(0, len(artist_ids), 50):
-        batch = await client.get_artists(artist_ids[i : i + 50])
-        for a in batch:
-            artist_map[a.id] = a
+    try:
+        for i in range(0, len(artist_ids), 50):
+            batch = await client.get_artists(artist_ids[i : i + 50])
+            for a in batch:
+                artist_map[a.id] = a
+    except Exception:
+        pass
 
     # Fetch lyrics concurrently for tracks without a cached lyric embedding
     async def maybe_fetch_lyrics(track: SpotifyTrack) -> tuple[str, str | None]:

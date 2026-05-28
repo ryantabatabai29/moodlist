@@ -36,3 +36,9 @@ Thumbs.db
 # Postgres / Redis volumes
 postgres_data/
 redis_data/
+
+# Project docs
+CHANGELOG.md
+CLAUDE.md
+PRD.md
+TASKS.md

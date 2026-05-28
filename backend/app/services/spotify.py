@@ -1,8 +1,11 @@
 import asyncio
+import logging
 from dataclasses import dataclass, field
 
 import httpx
 from fastapi import HTTPException
+
+logger = logging.getLogger(__name__)
 
 
 SPOTIFY_BASE = "https://api.spotify.com/v1"
@@ -55,21 +58,18 @@ class SpotifyClient:
     async def get_playlist_info(self, playlist_id: str) -> dict:
         return await self._get(
             f"{SPOTIFY_BASE}/playlists/{playlist_id}",
-            params={"fields": "id,name,snapshot_id,tracks.total"},
+            params={"fields": "id,name,snapshot_id,owner.id"},
         )
 
     async def get_playlist_tracks(self, playlist_id: str) -> list[SpotifyTrack]:
         tracks: list[SpotifyTrack] = []
-        url: str | None = f"{SPOTIFY_BASE}/playlists/{playlist_id}/tracks"
-        params: dict | None = {
-            "limit": 100,
-            "fields": "next,items(track(id,uri,name,popularity,explicit,duration_ms,artists(id,name)))",
-        }
+        url: str | None = f"{SPOTIFY_BASE}/playlists/{playlist_id}/items"
+        params: dict | None = {"limit": 100}
 
         while url:
             data = await self._get(url, params=params)
             for item in data.get("items", []):
-                track = item.get("track")
+                track = item.get("item")
                 if track and track.get("id"):
                     tracks.append(_parse_track(track))
             url = data.get("next")
@@ -116,7 +116,7 @@ class SpotifyClient:
     async def add_tracks(self, playlist_id: str, track_uris: list[str]) -> None:
         for i in range(0, len(track_uris), 100):
             await self._post(
-                f"{SPOTIFY_BASE}/playlists/{playlist_id}/tracks",
+                f"{SPOTIFY_BASE}/playlists/{playlist_id}/items",
                 json={"uris": track_uris[i : i + 100]},
             )
 
@@ -135,6 +135,8 @@ class SpotifyClient:
                 raise HTTPException(
                     status_code=404, detail="Spotify resource not found"
                 )
+            if not resp.is_success:
+                logger.error("Spotify %s %s: %s", resp.status_code, url, resp.text)
             resp.raise_for_status()
             return resp.json()
 
